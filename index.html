@@ -106,15 +106,15 @@ async function loadClassifier(){
   if(loadingPromise) return loadingPromise;
 
   loadingPromise=(async()=>{
-    setStatus('AIモデルを準備しています。初回だけ時間がかかります。\n今回はiPhone向けの軽量モデルを使用します。');
+    setStatus('AIモデルを準備しています。初回だけ時間がかかります。\niPhone向けの軽量モデルを起動します。');
     try{
-      if(!('gpu' in navigator)) throw new Error('WebGPUなし');
-      classifier=await pipeline('zero-shot-image-classification',MODEL,{device:'webgpu',dtype:'q8'});
+      if(!('gpu' in navigator)) throw new Error('このSafariではWebGPUが利用できません');
+      classifier=await pipeline('zero-shot-image-classification',MODEL,{device:'webgpu',dtype:'fp16'});
       setMode('iPhone GPU（WebGPU）');
       return classifier;
     }catch(webgpuError){
       console.warn('WebGPU failed; falling back to WASM',webgpuError);
-      setStatus('iPhoneのGPU処理が使えないため、互換性の高い通常処理へ切り替えています。\n少し時間がかかります。');
+      setStatus('GPU処理を使えないため、iPhone向けの軽量CPU処理へ切り替えています。\n少し時間がかかります。');
       try{
         classifier=await pipeline('zero-shot-image-classification',MODEL,{device:'wasm',dtype:'q8'});
         setMode('互換モード（CPU/WASM）');
